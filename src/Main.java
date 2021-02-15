@@ -33,6 +33,7 @@ public class Main extends JFrame{
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         ui = new UI();
         add(ui);
+        repaint();
     }
 
     public static void main(String args[]) throws IOException, InterruptedException {
