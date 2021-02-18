@@ -44,6 +44,7 @@ public class UI extends JPanel{
         add(term);
         repo = new JPanel();
         repo.setBounds(5,5,990,90);
+        repo.setLayout(null);
         add(repo);
     }
 
@@ -99,7 +100,33 @@ public class UI extends JPanel{
         ChangeBranch.setForeground(Color.LIGHT_GRAY);
         repo.add(ChangeBranch);
         CreateRepo = new JButton("Create Repo");
-        //CreateRepo.setBounds();
+        CreateRepo.setBounds(5,45,140,35);
+        CreateRepo.setBackground(Color.BLACK);
+        CreateRepo.setForeground(Color.LIGHT_GRAY);
+        CreateRepo.addActionListener((ActionEvent e)->{
+            try {
+                Parent.createRepo();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
+        });
+        repo.add(CreateRepo);
+        CreateBranch = new JButton("Create Repo");
+        CreateBranch.setBounds(5,45,140,35);
+        CreateBranch.setBackground(Color.BLACK);
+        CreateBranch.setForeground(Color.LIGHT_GRAY);
+        CreateBranch.addActionListener((ActionEvent e)->{
+            try {
+                Parent.createBranch();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
+        });
+        repo.add(CreateRepo);
         repaint();
     }
 
