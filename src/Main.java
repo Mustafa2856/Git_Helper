@@ -55,11 +55,13 @@ public class Main extends JFrame {
         if (sc.hasNextLine()) {
             ui.term.setText("");
             ui.term.append("Branches:\n");
+            String s;
             while (sc.hasNextLine()) {
-                BRANCHES.add(sc.nextLine().substring(2));
+                s = sc.nextLine();
+                if(s.charAt(0)=='*'){BRANCHES.add(s.substring(2));Branch = s.substring(2);}
+                else BRANCHES.add(s.substring(2));
                 ui.term.append(BRANCHES.get(BRANCHES.size() - 1) + "\n");
             }
-            Branch = BRANCHES.get(0);
             this.ui.initRepoinfo(repo.getAbsolutePath(), Branch);
             PrintWriter pr = new PrintWriter(new FileOutputStream(cnf.getAbsolutePath()));
             pr.println(repo.getAbsolutePath());
@@ -77,11 +79,25 @@ public class Main extends JFrame {
         prr.directory(repo);
         Process p = prr.start();
         p.waitFor();
-        Scanner sc = new Scanner(p.getInputStream());
+        Scanner sc = new Scanner(p.getErrorStream());
+        if(sc.hasNextLine()){
+            while (sc.hasNextLine()) {
+                ui.term.append(sc.nextLine() + "\n");
+            }
+        }
+        prr = new ProcessBuilder("git", "branch");
+        prr.directory(repo);
+        p = prr.start();
+        p.waitFor();
+        Branch = "";
+        String s;
+        sc = new Scanner(p.getInputStream());
         while (sc.hasNextLine()) {
-            ui.term.append(sc.nextLine() + "\n");
+            s = sc.nextLine();
+            if(s.charAt(0)=='*'){Branch = s.substring(2);}
         }
         sc.close();
+        ui.initRepoinfo(repo.getAbsolutePath(), Branch);
     }
 
     void createRepo() throws IOException, InterruptedException {
@@ -127,8 +143,16 @@ public class Main extends JFrame {
         this.ui.initRepoinfo(repo.getAbsolutePath(), Branch);
     }
 
-    public void createBranch() throws IOException, InterruptedException{
-
+    public void createBranch(String br) throws IOException, InterruptedException{
+        ProcessBuilder prr = new ProcessBuilder("git","checkout","-b",br);
+        prr.directory(repo);
+        Process p = prr.start();
+        p.waitFor();
+        Scanner sc = new Scanner(p.getErrorStream());
+        if(sc.hasNextLine()){
+            ui.term.append(sc.nextLine()+"\n");
+        }
+        else ui.initRepoinfo(repo.getAbsolutePath(),br);
     }
 
     public static void main(String args[]) throws IOException, InterruptedException {
@@ -136,16 +160,20 @@ public class Main extends JFrame {
         if (m.REPOSITORIES.size() == 0) {
             m.selectRepo();
         } else {
+            m.repo = new File(m.REPOSITORIES.get(0));
             ProcessBuilder prr = new ProcessBuilder("git", "branch");
             prr.directory(m.repo);
             Process p = prr.start();
             p.waitFor();
             m.Branch = "";
+            String s;
             Scanner sc = new Scanner(p.getInputStream());
             while (sc.hasNextLine()) {
-                m.BRANCHES.add(sc.nextLine().substring(2));
+                s = sc.nextLine();
+                if(s.charAt(0)=='*'){m.BRANCHES.add(s.substring(2));m.Branch = s.substring(2);}
+                else m.BRANCHES.add(s.substring(2));
+
             }
-            m.Branch = m.BRANCHES.get(0);
             m.ui.initRepoinfo(m.REPOSITORIES.get(0), m.Branch);
         }
     }
